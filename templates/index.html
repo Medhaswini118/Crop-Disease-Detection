@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Disease Detection</title>
+    <style>
+        /* Vibrant Background */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #11998e, #38ef7d);
+            color: white;
+            text-align: center;
+            margin: 50px;
+            color: #fff; /* White text for better contrast */
+        }
+
+        /* Welcome Header - Positioned above the container */
+        .welcome-header {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: fadeIn 2s ease-in-out;
+            color: #ffeb3b; /* Yellow to stand out */
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        .file-input {
+            margin-top: 15px;
+        }
+
+        .preview-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        #preview {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .buttons {
+            margin-top: 15px;
+        }
+
+        button {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 5px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #e68900;
+        }
+
+        .reset {
+            background: #f44336;
+        }
+
+        .reset:hover {
+            background: #d32f2f;
+        }
+
+        #result-container {
+            display: none;
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 5px;
+            background: #eeeeee;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #result {
+            color: #388e3c;
+            font-size: 20px;
+        }
+
+        #prevention {
+            color: #1976d2;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        #error {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Bottom Section */
+        .bottom-section {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .slogan {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffeb3b;
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            font-size: 12px;
+            color: #ddd;
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Welcome Header -->
+    <div class="welcome-header" id="welcomeHeader">🌱 Welcome, Plant Guardian! 🌿</div>
+
+    <div class="container">
+        <h1>🌿 Crop Disease Detection 🌿</h1>
+
+        <input type="file" id="fileInput" accept="image/*" class="file-input">
+        
+        <div class="preview-container">
+            <img id="preview" alt="Image Preview">
+        </div>
+
+        <div class="buttons">
+            <button onclick="uploadImage()">Predict</button>
+            <button class="reset" onclick="resetForm()">Reset</button>
+        </div>
+
+        <div id="error"></div>
+
+        <div id="result-container">
+            <div id="result"></div>
+            <div id="prevention"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="bottom-section">
+        <div class="slogan">🌍 Crop by Crop, We Don't Stop 🌾</div>
+        <div class="footer">&copy; 2025 Crop Disease Detection | Made with ❤️</div>
+    </div>
+
+    <script>
+        // Dynamic Welcome Messages
+        const welcomeMessages = [
+            "🌱 Welcome, Plant Guardian! 🌿",
+            "🍃 Keeping Your Crops Healthy, One Leaf at a Time!",
+            "🌾 Detect. Protect. Grow Stronger! 🌱",
+            "🌍 Your Plants Deserve the Best Care!",
+            "💡 AI-Powered Disease Detection for a Greener Future!"
+        ];
+
+        function changeWelcomeMessage() {
+            const welcomeHeader = document.getElementById("welcomeHeader");
+            let index = 0;
+
+            setInterval(() => {
+                welcomeHeader.textContent = welcomeMessages[index];
+                index = (index + 1) % welcomeMessages.length;
+            }, 3000);
+        }
+
+        changeWelcomeMessage();
+
+        function uploadImage() {
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                document.getElementById("error").textContent = "⚠️ Please select an image.";
+                return;
+            }
+
+            // Clear previous results
+            document.getElementById("result-container").style.display = "none";
+            document.getElementById("error").textContent = "";
+
+            // Show image preview
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("preview").src = e.target.result;
+                document.querySelector(".preview-container").style.display = "block";
+            };
+            reader.readAsDataURL(file);
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Send to backend
+            fetch("http://127.0.0.1:5000/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("error").textContent = "❌ Error: " + data.error;
+                } else {
+                    document.getElementById("result").textContent = "🌾 Disease: " + data.disease;
+                    document.getElementById("prevention").textContent = "💡 Prevention: " + data.prevention;
+                    document.getElementById("result-container").style.display = "block"; // Show results
+                }
+            })
+            .catch(error => {
+                document.getElementById("error").textContent = "❌ Failed to fetch prediction.";
+            });
+        }
+
+        function resetForm() {
+            document.getElementById("fileInput").value = "";
+            document.getElementById("preview").src = "";
+            document.querySelector(".preview-container").style.display = "none";
+            document.getElementById("result-container").style.display = "none";
+            document.getElementById("error").textContent = "";
+        }
+    </script>
+
+</body>
+</html>
+
+
+
+
