@@ -94,9 +94,8 @@ def predict():
 
     return jsonify(result)
 
-port = int(os.environ.get("PORT", 5000))  # Get the assigned Render port
-print(f"Starting Flask server on port {port}...")  # Debugging message
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=port, debug=True)
+    port = int(os.environ.get("PORT", 10000))  # Default to 10000 if not set
+app.run(host="0.0.0.0", port=port, debug=True)
 
