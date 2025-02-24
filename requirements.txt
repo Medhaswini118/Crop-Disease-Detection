@@ -4,4 +4,6 @@ numpy
 pillow
 gunicorn
 flask-cors
+gunicorn
+
 
