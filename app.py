@@ -10,8 +10,16 @@ import io
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend communication
 
-# Load the trained model
-model = load_model("models/best_crop_disease_model.keras")
+# Load the model ONCE when the app starts
+model = None  # Initialize as None
+
+def load_model_once():
+    global model
+    if model is None:
+        model = load_model("models/best_crop_disease_model.keras")
+        print("✅ Model loaded successfully!")
+
+load_model_once()  # Call the function to load the model
 
 # Disease class labels
 class_labels = {
@@ -78,25 +86,10 @@ def predict_disease(image_data):
 
     return {"disease": disease_name, "prevention": prevention}
 
-# Load the model once at the start
-model = None  # Initialize as None
-
-def load_model_once():
-    global model
-    if model is None:
-        model = load_model("models/best_crop_disease_model.keras")
-        print("Model loaded successfully!")
-
-load_model_once()  # Load the model when the app starts
-
-
-
 # API endpoint for prediction
-
 @app.route("/")
 def home():
     return "Welcome to the Crop Disease Detection API! Use the /predict endpoint to classify plant diseases."
-
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -113,8 +106,6 @@ def predict():
 
     return jsonify(result)
 
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
-
