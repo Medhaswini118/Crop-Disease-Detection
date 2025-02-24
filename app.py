@@ -79,6 +79,12 @@ def predict_disease(image_data):
     return {"disease": disease_name, "prevention": prevention}
 
 # API endpoint for prediction
+
+@app.route("/")
+def home():
+    return "Welcome to the Crop Disease Detection API! Use the /predict endpoint to classify plant diseases."
+
+
 @app.route("/predict", methods=["POST"])
 def predict():
     if "file" not in request.files:
