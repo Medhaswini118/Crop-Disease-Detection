@@ -78,6 +78,19 @@ def predict_disease(image_data):
 
     return {"disease": disease_name, "prevention": prevention}
 
+# Load the model once at the start
+model = None  # Initialize as None
+
+def load_model_once():
+    global model
+    if model is None:
+        model = load_model("models/best_crop_disease_model.keras")
+        print("Model loaded successfully!")
+
+load_model_once()  # Load the model when the app starts
+
+
+
 # API endpoint for prediction
 
 @app.route("/")
