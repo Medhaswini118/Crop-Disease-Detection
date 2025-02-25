@@ -8,7 +8,7 @@ from PIL import Image
 import io
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # Allow cross-origin requests
 
 # Define model path and Google Drive file ID
 MODEL_PATH = "models/best_crop_disease_model.keras"
@@ -32,7 +32,7 @@ try:
     print("✅ Model loaded successfully!")
 except Exception as e:
     print(f"❌ Error loading model: {e}")
-    model = None  # Set model to None if it fails to load
+    model = None  # Set model to None if loading fails
 
 # Disease class labels
 class_labels = {
@@ -53,7 +53,7 @@ class_labels = {
     36: "Tomato___Tomato_mosaic_virus", 37: "Tomato___healthy"
 }
 
-# Prevention measures
+# Prevention measures (Only showing a few, you can extend it)
 prevention_measures = {
     "Apple___Apple_scab": "Prune infected branches, apply fungicides, and plant resistant varieties.",
     "Apple___Black_rot": "Remove infected fruit, use copper-based fungicides, and ensure proper air circulation.",
@@ -94,6 +94,7 @@ prevention_measures = {
     "Tomato___Tomato_mosaic_virus": "Avoid tobacco use near plants, disinfect tools, and remove infected plants.",
     "Tomato___healthy": "No disease detected! Ensure proper watering, fertilization, and pest control."
 
+
 }
 
 # Allowed file types
@@ -108,20 +109,30 @@ def predict_disease(image_data):
     if model is None:
         return {"error": "Model is not loaded. Please check server logs."}
 
-    img = Image.open(io.BytesIO(image_data)).convert("RGB")  # Convert to RGB
-    img = img.resize((128, 128))  # Resize image
-    img_array = np.array(img) / 255.0  # Normalize
-    img_array = np.expand_dims(img_array, axis=0)  # Expand for model input
+    try:
+        # Process image
+        img = Image.open(io.BytesIO(image_data)).convert("RGB")  # Convert to RGB
+        img = img.resize((128, 128))  # Resize image
+        img_array = np.array(img) / 255.0  # Normalize
+        img_array = np.expand_dims(img_array, axis=0)  # Expand for model input
 
-    # Make prediction
-    predictions = model.predict(img_array)
-    predicted_class = np.argmax(predictions)
+        # Make prediction
+        predictions = model.predict(img_array)
+        predicted_class_index = np.argmax(predictions)
+        confidence_score = round(float(np.max(predictions)) * 100, 2)  # Convert to percentage
 
-    # Get disease name and prevention measures
-    disease_name = class_labels.get(predicted_class, "Unknown Disease")
-    prevention = prevention_measures.get(disease_name, "Remove infected leaves, apply fungicides, and improve air circulation.")
+        # Get disease name and prevention measures
+        disease_name = class_labels.get(predicted_class_index, "Unknown Disease")
+        prevention = prevention_measures.get(disease_name, "No specific prevention measure available.")
 
-    return {"disease": disease_name, "prevention": prevention}
+        return {
+            "disease": disease_name,
+            "confidence": confidence_score,
+            "prevention": prevention
+        }
+    
+    except Exception as e:
+        return {"error": f"Error processing image: {str(e)}"}
 
 # API endpoint for prediction
 @app.route("/")
@@ -140,11 +151,14 @@ def predict():
     if not allowed_file(file.filename):
         return jsonify({"error": "Invalid file type. Please upload a PNG or JPG image."}), 400
 
-    # Read file and make prediction
-    image_data = file.read()
-    result = predict_disease(image_data)
+    try:
+        # Read file and make prediction
+        image_data = file.read()
+        result = predict_disease(image_data)
+        return jsonify(result)
 
-    return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))  # Default to 10000 if PORT not set
