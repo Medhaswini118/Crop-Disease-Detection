@@ -18,7 +18,7 @@ def download_model():
     """Downloads model from Google Drive if not present locally."""
     if not os.path.exists(MODEL_PATH):
         print("📥 Downloading model from Google Drive...")
-        url = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
+        url = f"https://drive.google.com/file/d/1ovzbUpvFsrA04z5WgyOxlbqxGmnKQ_nm/view?usp=sharing"
         os.makedirs("models", exist_ok=True)
         gdown.download(url, MODEL_PATH, quiet=False)
         print("✅ Model downloaded!")
