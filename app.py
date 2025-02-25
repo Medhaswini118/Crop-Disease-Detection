@@ -12,13 +12,13 @@ CORS(app)
 
 # Define model path and Google Drive file ID
 MODEL_PATH = "models/best_crop_disease_model.keras"
-GDRIVE_FILE_ID = "1ovzbUpvFsrA04z5WgyOxlbqxGmnKQ_nm"  # Your Google Drive model file ID
+GDRIVE_FILE_ID = "1jEvdm0UbVj6hIHWCiU7Bgm_aaleKvmN8"  # Your Google Drive model file ID
 
 def download_model():
     """Downloads model from Google Drive if not present locally."""
     if not os.path.exists(MODEL_PATH):
         print("📥 Downloading model from Google Drive...")
-        url = f"https://drive.google.com/file/d/1ovzbUpvFsrA04z5WgyOxlbqxGmnKQ_nm/view?usp=sharing"
+        url = f"https://drive.google.com/file/d/1jEvdm0UbVj6hIHWCiU7Bgm_aaleKvmN8/view?usp=sharing"
         os.makedirs("models", exist_ok=True)
         gdown.download(url, MODEL_PATH, quiet=False)
         print("✅ Model downloaded!")
