@@ -4,3 +4,4 @@ dataset/
 test/
 models/
 *.keras
+models/best_crop_disease_model.keras
