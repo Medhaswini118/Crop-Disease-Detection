@@ -8,7 +8,8 @@ from PIL import Image
 import io
 
 app = Flask(__name__)
-CORS(app)  # Allow cross-origin requests
+CORS(app, resources={r"/predict": {"origins": "https://medhaswini118.github.io"}})
+# Allow cross-origin requests
 
 # Define model path and Google Drive file ID
 MODEL_PATH = "models/best_crop_disease_model.keras"
