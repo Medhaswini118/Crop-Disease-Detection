@@ -10,7 +10,8 @@ import io
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/predict": {"origins": "*"}})  # Allow all origins for /predict
+CORS(app, resources={r"/predict": {"origins": "https://medhaswini118.github.io"}})
+  # Allow all origins for /predict
 # Allow cross-origin requests
 
 # Define model path and Google Drive file ID
