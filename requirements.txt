@@ -1,11 +1,11 @@
-Flask==2.2.2
-flask-cors==3.1.1
-tensorflow==2.11.0
-gdown==4.4.0
-Pillow==9.2.0
-numpy==1.23.4
+flask
+tensorflow
+numpy
+pillow
+flask-cors
+gunicorn
+gdown
 waitress==2.1.2
-
 
 
 
