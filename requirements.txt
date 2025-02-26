@@ -5,6 +5,7 @@ pillow
 flask-cors
 gunicorn
 gdown
+waitress==2.1.2
 
 
 
