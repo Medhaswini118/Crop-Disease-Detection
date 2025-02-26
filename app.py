@@ -168,7 +168,9 @@ def predict():
         return jsonify({"error": f"Error processing image: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    from waitress import serve
-    port = int(os.environ.get("PORT", 5000))
+    from waitress import serve  # Ensure it's installed
+    port = int(os.environ.get("PORT", 5000))  # Default to 5000
+    print(f"🚀 Starting server on port {port}...")
     serve(app, host="0.0.0.0", port=port)
+
 
