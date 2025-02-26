@@ -22,7 +22,8 @@ def download_model():
     if not os.path.exists(MODEL_PATH):
         print("📥 Downloading model from Google Drive...")
         os.makedirs("models", exist_ok=True)
-        gdown.download("1jEvdm0UbVj6hIHWCiU7Bgm_aaleKvmN8", MODEL_PATH, quiet=False)
+        gdown.download("https://drive.google.com/uc?export=download&id=1jEvdm0UbVj6hIHWCiU7Bgm_aaleKvmN8", MODEL_PATH, quiet=False)
+
         print("✅ Model downloaded!")
 
 # Ensure the model is downloaded before loading
