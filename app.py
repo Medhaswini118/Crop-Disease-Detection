@@ -130,7 +130,7 @@ def predict_disease(image_data):
 
         return {
             "disease": disease_name,
-            "confidence": confidence_score,
+            
             "prevention": prevention
         }
     
