@@ -159,10 +159,19 @@ def predict():
         return jsonify({"error": "Invalid file type. Please upload a PNG or JPG image."}), 400
 
     try:
-        # Read file and make prediction
-        image_data = file.read()
-        result = predict_disease(image_data)
-        return jsonify(result)
+    	# Read file and make prediction
+    	image_data = file.read()
+    	result = predict_disease(image_data)
+
+    	# Ensure the result contains both disease and prevention info
+    	if "disease" in result and "prevention" in result:
+        	return jsonify({
+            		"disease": result["disease"],
+            		"prevention": result["prevention"]
+        	})
+    	else:
+        	return jsonify({"error": "Prediction failed. No disease or prevention found."}), 400
+
     
     except Exception as e:
         return jsonify({"error": f"Error processing image: {str(e)}"}), 500
