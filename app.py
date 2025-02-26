@@ -144,10 +144,14 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    print("Received request:", request)  # Debugging line
+    
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
 
     file = request.files["file"]
+    print("Received file:", file.filename)  # Debugging line
+
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
 
@@ -159,9 +163,9 @@ def predict():
         image_data = file.read()
         result = predict_disease(image_data)
         return jsonify(result)
-
+    
     except Exception as e:
-        return jsonify({"error": f"Server error: {str(e)}"}), 500
+        return jsonify({"error": f"Error processing image: {str(e)}"}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Default to 5000 (common for Flask)
