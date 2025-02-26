@@ -168,6 +168,7 @@ def predict():
         return jsonify({"error": f"Error processing image: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Default to 5000 (common for Flask)
-  # Default to 10000 if PORT not set
-    app.run(host="0.0.0.0", port=port, debug=True)
+    from waitress import serve
+    port = int(os.environ.get("PORT", 5000))
+    serve(app, host="0.0.0.0", port=port)
+
