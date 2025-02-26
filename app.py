@@ -7,8 +7,10 @@ import numpy as np
 from PIL import Image
 import io
 
+
+
 app = Flask(__name__)
-CORS(app, resources={r"/predict": {"origins": "https://medhaswini118.github.io"}})
+CORS(app, resources={r"/predict": {"origins": "*"}})  # Allow all origins for /predict
 # Allow cross-origin requests
 
 # Define model path and Google Drive file ID
@@ -19,9 +21,8 @@ def download_model():
     """Downloads model from Google Drive if not present locally."""
     if not os.path.exists(MODEL_PATH):
         print("📥 Downloading model from Google Drive...")
-        url = f"https://drive.google.com/uc?id=1jEvdm0UbVj6hIHWCiU7Bgm_aaleKvmN8"
         os.makedirs("models", exist_ok=True)
-        gdown.download(url, MODEL_PATH, quiet=False)
+        gdown.download("1jEvdm0UbVj6hIHWCiU7Bgm_aaleKvmN8", MODEL_PATH, quiet=False)
         print("✅ Model downloaded!")
 
 # Ensure the model is downloaded before loading
@@ -162,5 +163,6 @@ def predict():
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # Default to 10000 if PORT not set
+    port = int(os.environ.get("PORT", 5000))  # Default to 5000 (common for Flask)
+  # Default to 10000 if PORT not set
     app.run(host="0.0.0.0", port=port, debug=True)
