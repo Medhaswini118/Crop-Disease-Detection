@@ -9,19 +9,18 @@
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(to right, #11998e, #38ef7d);
-            color: white;
             text-align: center;
             margin: 50px;
             color: #fff; /* White text for better contrast */
         }
 
-        /* Welcome Header - Positioned above the container */
+        /* Welcome Header */
         .welcome-header {
             font-size: 28px;
             font-weight: bold;
             margin-bottom: 20px;
             animation: fadeIn 2s ease-in-out;
-            color: #ffeb3b; /* Yellow to stand out */
+            color: #ffeb3b;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
         }
 
@@ -96,12 +95,12 @@
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        #result {
+        #disease-name {
             color: #388e3c;
             font-size: 20px;
         }
 
-        #prevention {
+        #prevention-measures {
             color: #1976d2;
             font-size: 16px;
             margin-top: 10px;
@@ -159,9 +158,13 @@
 
         <div id="error"></div>
 
-        <div id="result-container">
-            <div id="result"></div>
-            <div id="prevention"></div>
+        <div id="result-container" style="display: none;">
+    <h3 id="disease-name"></h3>
+    
+    <p id="prevention-measures"></p>
+</div>
+<p id="error" style="color: red;"></p>
+
         </div>
     </div>
 
@@ -173,82 +176,95 @@
 
     <script>
         // Dynamic Welcome Messages
-        const welcomeMessages = [
-            "🌱 Welcome, Plant Guardian! 🌿",
-            "🍃 Keeping Your Crops Healthy, One Leaf at a Time!",
-            "🌾 Detect. Protect. Grow Stronger! 🌱",
-            "🌍 Your Plants Deserve the Best Care!",
-            "💡 AI-Powered Disease Detection for a Greener Future!"
-        ];
+const welcomeMessages = [
+    "🌱 Welcome, Plant Guardian! 🌿",
+    "🍃 Keeping Your Crops Healthy, One Leaf at a Time!",
+    "🌾 Detect. Protect. Grow Stronger! 🌱",
+    "🌍 Your Plants Deserve the Best Care!",
+    "💡 AI-Powered Disease Detection for a Greener Future!"
+];
 
-        function changeWelcomeMessage() {
-            const welcomeHeader = document.getElementById("welcomeHeader");
-            let index = 0;
+function changeWelcomeMessage() {
+    const welcomeHeader = document.getElementById("welcomeHeader");
+    let index = 0;
 
-            setInterval(() => {
-                welcomeHeader.textContent = welcomeMessages[index];
-                index = (index + 1) % welcomeMessages.length;
-            }, 3000);
+    setInterval(() => {
+        welcomeHeader.textContent = welcomeMessages[index];
+        index = (index + 1) % welcomeMessages.length;
+    }, 3000);
+}
+
+changeWelcomeMessage();
+
+function uploadImage() {
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+
+    if (!file) {
+        document.getElementById("error").textContent = "⚠️ Please select an image.";
+        return;
+    }
+
+    // Clear previous results
+    document.getElementById("result-container").style.display = "none";
+    document.getElementById("error").textContent = "";
+    document.getElementById("disease-name").textContent = "⏳ Predicting...";
+    
+    document.getElementById("prevention-measures").textContent = "";
+
+    // Show image preview
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        document.getElementById("preview").src = e.target.result;
+        document.querySelector(".preview-container").style.display = "block";
+    };
+    reader.readAsDataURL(file);
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // Send request to backend
+    fetch("https://crop-disease-detection-6kr0.onrender.com/predict", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "Accept": "application/json"
         }
-
-        changeWelcomeMessage();
-
-        function uploadImage() {
-            const fileInput = document.getElementById("fileInput");
-            const file = fileInput.files[0];
-
-            if (!file) {
-                document.getElementById("error").textContent = "⚠️ Please select an image.";
-                return;
-            }
-
-            // Clear previous results
-            document.getElementById("result-container").style.display = "none";
-            document.getElementById("error").textContent = "";
-
-            // Show image preview
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById("preview").src = e.target.result;
-                document.querySelector(".preview-container").style.display = "block";
-            };
-            reader.readAsDataURL(file);
-
-            // Prepare form data
-            const formData = new FormData();
-            formData.append("file", file);
-
-            // Send to backend
-            fetch("http://127.0.0.1:5000/predict", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    document.getElementById("error").textContent = "❌ Error: " + data.error;
-                } else {
-                    document.getElementById("result").textContent = "🌾 Disease: " + data.disease;
-                    document.getElementById("prevention").textContent = "💡 Prevention: " + data.prevention;
-                    document.getElementById("result-container").style.display = "block"; // Show results
-                }
-            })
-            .catch(error => {
-                document.getElementById("error").textContent = "❌ Failed to fetch prediction.";
-            });
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            document.getElementById("error").textContent = "❌ Error: " + data.error;
+        } else {
+            // Display results
+            document.getElementById("disease-name").innerHTML = `<strong>🌾 Disease:</strong> ${data.disease}`;
+            
+            
+            document.getElementById("prevention-measures").innerHTML = `<strong>💡 Prevention:</strong> ${data.prevention}`;
+            
+            document.getElementById("result-container").style.display = "block"; // Show results
         }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        document.getElementById("error").textContent = "❌ Failed to fetch prediction.";
+    });
+}
 
-        function resetForm() {
-            document.getElementById("fileInput").value = "";
-            document.getElementById("preview").src = "";
-            document.querySelector(".preview-container").style.display = "none";
-            document.getElementById("result-container").style.display = "none";
-            document.getElementById("error").textContent = "";
-        }
+function resetForm() {
+    document.getElementById("fileInput").value = "";
+    document.getElementById("preview").src = "";
+    document.querySelector(".preview-container").style.display = "none";
+    document.getElementById("result-container").style.display = "none";
+    document.getElementById("error").textContent = "";
+}
+
     </script>
 
 </body>
 </html>
+
 
 
 
